@@ -5,7 +5,7 @@ public sealed class SecondSolution() : ReadersWritersSolution(2)
    private static readonly ReaderWriterLock ReaderWriterLock = new();
    private const int TimeOut = 100;
    
-   protected override void ReadBalance()
+   protected override void ReadData()
    {
       try 
       {
@@ -25,7 +25,7 @@ public sealed class SecondSolution() : ReadersWritersSolution(2)
       }
    }
 
-   protected override void Transfer()
+   protected override void TransferData()
    {
       try 
       {

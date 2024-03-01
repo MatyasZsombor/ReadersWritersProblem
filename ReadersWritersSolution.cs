@@ -22,7 +22,7 @@ public abstract class ReadersWritersSolution
             {
                 Name = $"Thread{i + 1}"
             };
-            BankAccounts.Add(new BankAccount(Threads[i].Name!, Random.NextDouble() * 10000));
+            TraficSensors.Add(new TraficSensor(Threads[i].Name!, Random.NextDouble() * 10000));
         }
 
         foreach (Thread thread in Threads)
@@ -43,25 +43,25 @@ public abstract class ReadersWritersSolution
         {
             if (Random.Next(2) == 0)
             {
-                ReadBalance();
+                ReadData();
                 continue;
             }
-            Transfer();
+            TransferData();
         }
     }
 
-    protected abstract void ReadBalance();
-    protected abstract void Transfer();
+    protected abstract void ReadData();
+    protected abstract void TransferData();
 
     private void WriteStatistics()
     {
         string str = $"\nNumber of Transfers: {NumOfTransfers}\nNumber of Readings: {NumOfReadings}\n\n";
         if (Id == 2) { str += $"Number of Transfers timeouts: {NumOfTransferTimeouts}\nNumber of Reading Timeouts: {NumOfReaderTimeouts}\n\n"; }
 
-        foreach (BankAccount bankAccount in BankAccounts)
+        foreach (TraficSensor traficSensor in TraficSensors)
         {
-            str += $"History of Bank Account {bankAccount.AccountOwner}\n";
-            str = bankAccount.TransferHistory.Aggregate(str, (current, transfer) => current + transfer + "\n");
+            str += $"History of Sensor {traficSensor.SensorOwner}\n";
+            str = traficSensor.SensorHistory.Aggregate(str, (current, transfer) => current + transfer + "\n");
             str += "\n";
         }
         File.AppendAllText($"../../../transferHistory{Id}.txt", str);
@@ -69,25 +69,25 @@ public abstract class ReadersWritersSolution
 
     protected void ReadBalanceCriticalRegion()
     {
-        Console.WriteLine($"Current Balance of {Thread.CurrentThread.Name} is {BankAccounts.Where(x => x.AccountOwner == Thread.CurrentThread.Name).ToArray()[0].CurBalance.ToString("C2", CultureInfo.CreateSpecificCulture("de-AT"))}");
-        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Current Balance of {Thread.CurrentThread.Name} is {BankAccounts.Where(x => x.AccountOwner == Thread.CurrentThread.Name).ToArray()[0].CurBalance.ToString("C2", CultureInfo.CreateSpecificCulture("de-AT"))}\n");
+        Console.WriteLine($"Current Data of {Thread.CurrentThread.Name} is {TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}");
+        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Current Data of {Thread.CurrentThread.Name} is {TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}\n");
         NumOfReadings++;
     }
 
     protected void TransferCriticalRegion()
     {
-        BankAccount curAccount = BankAccounts.Where(x => x.AccountOwner == Thread.CurrentThread.Name).ToArray()[0];
-        BankAccount target = BankAccounts[Random.Next(0, 9)];
-        double amount = Random.NextDouble() * (int)(curAccount.CurBalance - 1);
+        TraficSensor curAccount = TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0];
+        TraficSensor target = TraficSensors[Random.Next(0, 9)];
+        double amount = Random.NextDouble() * (int)(curAccount.CurData - 1);
         
-        while (target.AccountOwner == curAccount.AccountOwner)
+        while (target.SensorOwner == curAccount.SensorOwner)
         {
-            target = BankAccounts[Random.Next(0, 9)];
+            target = TraficSensors[Random.Next(0, 9)];
         }
         
-        Console.WriteLine($"Transferring {amount.ToString("C2", CultureInfo.CreateSpecificCulture("de-AT"))} from {curAccount.AccountOwner} to Thread {target.AccountOwner}.");
-        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Transferring {amount.ToString("C2", CultureInfo.CreateSpecificCulture("de-AT"))} from {curAccount.AccountOwner} to Thread {target.AccountOwner}.\n");
-        curAccount.OutgoingTransfer(amount, target);
+        Console.WriteLine($"Transferring {amount.ToString(CultureInfo.CreateSpecificCulture("de-AT"))} from {curAccount.SensorOwner} to Thread {target.SensorOwner}.");
+        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Transferring {amount.ToString(CultureInfo.CreateSpecificCulture("de-AT"))} from {curAccount.SensorOwner} to Thread {target.SensorOwner}.\n");
+        curAccount.OutgoingData(amount, target);
         
         Console.WriteLine("The transfer was successful.");
         File.AppendAllText($"../../../transferHistory{Id}.txt", "The transfer was successful.\n");
@@ -99,12 +99,12 @@ public abstract class ReadersWritersSolution
     private int Id { get; }
     private int NumOfTransfers { get; set; }
     private int NumOfReadings { get; set; }
-    protected int NumOfReaderTimeouts { get; set; } = 0;
-    protected int NumOfTransferTimeouts { get; set; } = 0;
-    protected int NumIterations { get; } = 3;
-    protected static int NumThreads { get; } = 10;
-    private List<BankAccount> BankAccounts { get; }= [];
-    protected static Random Random { get; } = new();
+    protected int NumOfReaderTimeouts { get; set; }
+    protected int NumOfTransferTimeouts { get; set; }
+    private static int NumIterations => 3;
+    protected static int NumThreads => 10;
+    private List<TraficSensor> TraficSensors { get; }= [];
+    private static Random Random { get; } = new();
     private Thread[] Threads { get; } = new Thread[10];
     #endregion
 }

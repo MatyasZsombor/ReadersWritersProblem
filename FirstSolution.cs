@@ -6,7 +6,7 @@ public sealed class FirstSolution() : ReadersWritersSolution(1)
     private readonly Semaphore _wrt = new(1, 1);
     private static int _numOfReaders;
 
-    protected override void ReadBalance()
+    protected override void ReadData()
     {
         //Enter Region
         _mutex.WaitOne();
@@ -32,7 +32,7 @@ public sealed class FirstSolution() : ReadersWritersSolution(1)
         _mutex.Release();
     }
 
-    protected override void Transfer()
+    protected override void TransferData()
     {
         //Enter Region
         _wrt.WaitOne();

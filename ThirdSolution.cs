@@ -9,7 +9,7 @@ public class ThirdSolution() : ReadersWritersSolution(3)
     private int _numOfWriters;
     private int _numOfReaders;
 
-    protected override void ReadBalance()
+    protected override void ReadData()
     {
         //Enter Region
         _readTry.WaitOne();
@@ -38,7 +38,7 @@ public class ThirdSolution() : ReadersWritersSolution(3)
         _rMutex.Release();
     }
 
-    protected override void Transfer()
+    protected override void TransferData()
     {
         //Enter Region
         _wrMutex.WaitOne();

@@ -7,7 +7,7 @@ public class FourthSolution() : ReadersWritersSolution(4)
     private readonly FifoSemaphore _queue = new();
     private int _numOfReaders;
     
-    protected override void ReadBalance()
+    protected override void ReadData()
     {
         //Enter Region
         _queue.WaitOne();
@@ -35,7 +35,7 @@ public class FourthSolution() : ReadersWritersSolution(4)
         _rMutex.Release();
     }
 
-    protected override void Transfer()
+    protected override void TransferData()
     {
         //Enter Region
         _queue.WaitOne();
