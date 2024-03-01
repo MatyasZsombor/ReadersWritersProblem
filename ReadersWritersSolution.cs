@@ -22,7 +22,7 @@ public abstract class ReadersWritersSolution
             {
                 Name = $"Thread{i + 1}"
             };
-            TraficSensors.Add(new TraficSensor(Threads[i].Name!, Random.NextDouble() * 10000));
+            TrafficSensors.Add(new TrafficSensor(Threads[i].Name!, Random.NextDouble() * 10000));
         }
 
         foreach (Thread thread in Threads)
@@ -58,7 +58,7 @@ public abstract class ReadersWritersSolution
         string str = $"\nNumber of Transfers: {NumOfTransfers}\nNumber of Readings: {NumOfReadings}\n\n";
         if (Id == 2) { str += $"Number of Transfers timeouts: {NumOfTransferTimeouts}\nNumber of Reading Timeouts: {NumOfReaderTimeouts}\n\n"; }
 
-        foreach (TraficSensor traficSensor in TraficSensors)
+        foreach (TrafficSensor traficSensor in TrafficSensors)
         {
             str += $"History of Sensor {traficSensor.SensorOwner}\n";
             str = traficSensor.SensorHistory.Aggregate(str, (current, transfer) => current + transfer + "\n");
@@ -69,20 +69,20 @@ public abstract class ReadersWritersSolution
 
     protected void ReadBalanceCriticalRegion()
     {
-        Console.WriteLine($"Current Data of {Thread.CurrentThread.Name} is {TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}");
-        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Current Data of {Thread.CurrentThread.Name} is {TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}\n");
+        Console.WriteLine($"Current Data of {Thread.CurrentThread.Name} is {TrafficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}");
+        File.AppendAllText($"../../../transferHistory{Id}.txt", $"Current Data of {Thread.CurrentThread.Name} is {TrafficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0].CurData.ToString(CultureInfo.CreateSpecificCulture("de-AT"))}\n");
         NumOfReadings++;
     }
 
     protected void TransferCriticalRegion()
     {
-        TraficSensor curAccount = TraficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0];
-        TraficSensor target = TraficSensors[Random.Next(0, 9)];
+        TrafficSensor curAccount = TrafficSensors.Where(x => x.SensorOwner == Thread.CurrentThread.Name).ToArray()[0];
+        TrafficSensor target = TrafficSensors[Random.Next(0, 9)];
         double amount = Random.NextDouble() * (int)(curAccount.CurData - 1);
         
         while (target.SensorOwner == curAccount.SensorOwner)
         {
-            target = TraficSensors[Random.Next(0, 9)];
+            target = TrafficSensors[Random.Next(0, 9)];
         }
         
         Console.WriteLine($"Transferring {amount.ToString(CultureInfo.CreateSpecificCulture("de-AT"))} from {curAccount.SensorOwner} to Thread {target.SensorOwner}.");
@@ -103,7 +103,7 @@ public abstract class ReadersWritersSolution
     protected int NumOfTransferTimeouts { get; set; }
     private static int NumIterations => 3;
     protected static int NumThreads => 10;
-    private List<TraficSensor> TraficSensors { get; }= [];
+    private List<TrafficSensor> TrafficSensors { get; }= [];
     private static Random Random { get; } = new();
     private Thread[] Threads { get; } = new Thread[10];
     #endregion
